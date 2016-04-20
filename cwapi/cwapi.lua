@@ -140,22 +140,22 @@ end
 
 function cwAPI.events.listen(event) 	
 	if _G[event] == nil then 
-		cwAPI.util.dev('Global '..event..' does not exists.',cwAPI.devMode);
+		cwAPI.util.log('Global '..event..' does not exists.');
 		return;
 	end
 	cwAPI.events.reset(event);
 	cwAPI.events.store(event);
 
 	_G[event] = function(a,b,c,d,e,f,g)
-		cwAPI.util.dev('> '..event,cwAPI.devMode);
+		cwAPI.util.log('> '..event);
 		cwAPI.events.printParams(a,b,c,e,d,f,g);
 		local fn = cwAPI.events.original(event);
-		cwAPI.util.dev('> fn',cwAPI.devMode);
+		cwAPI.util.log('> fn');
 		local ret = fn(a);
-		cwAPI.util.dev('> ret',cwAPI.devMode);
+		cwAPI.util.log('> ret');
 		return ret;
 	end
-	cwAPI.util.dev('api.events listening to '..event,cwAPI.devMode);
+	cwAPI.util.log('api.events listening to '..event);
 end
 
 function cwAPI.events.printParams(a,b,c,e,d,f,g) 	
@@ -233,14 +233,16 @@ end
 --	LOADER
 -- ======================================================
 
+cwAPI.events.resetAll();
+
 _G['ADDON_LOADER']['cwapi'] = function() 	
 	-- executing onload
-	cwAPI.events.resetAll();
 	cwAPI.events.on('UI_CHAT',parseMessage,true);
 	cwAPI.commands.register('/script',runScript);
 	cwAPI.commands.register('/addons',showAddonsButton);
 	cwAPI.commands.register('/reload',reloadAddons);
 	cwAPI.commands.register('/cw',checkCommand);	
 	cwAPI.util.log('[cwAPI:help] /cw');
+
 	return true;
 end 
