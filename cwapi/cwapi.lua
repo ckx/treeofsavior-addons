@@ -12,7 +12,7 @@ cwAPI.devMode = false;
 cwAPI.util = {};
 
 function cwAPI.util.log(msg) 
-	ui.SysMsg(getvarvalue(msg));  
+	CHAT_SYSTEM(getvarvalue(msg));  
 end 
 
 function cwAPI.util.dev(msg,flag) 
@@ -85,7 +85,7 @@ function cwAPI.events.original(event)
 	return _G[event..cwAPI.evorig];	
 end
 
-function cwAPI.events.on(event,callback,replace) 
+function cwAPI.events.on(event,callback,order) 
 	if _G[event] == nil then 
 		cwAPI.util.dev('Global '..event..' does not exists.',cwAPI.devMode);
 		return;
@@ -94,11 +94,20 @@ function cwAPI.events.on(event,callback,replace)
 	cwAPI.events.store(event);
 
 	_G[event] = function(a,b,c,d,e,f,g)
-		local ret = callback(a,b,c,d,e,f,g);
-		if (not replace) then
+		if (order == -1) then
+			callback(a,b,c,d,e,f,g);
+		end
+		if (order ~= 0) then
 			local fn = cwAPI.events.original(event);
 			local ret = fn(a,b,c,d,e,f,g);
 		end
+		if (order == 0) then			
+			local ret = callback(a,b,c,d,e,f,g);
+		end
+		if (order == 1) then
+			callback(a,b,c,d,e,f,g);
+		end
+
 		return ret;
 	end
 
@@ -235,14 +244,17 @@ end
 
 cwAPI.events.resetAll();
 
+
+
 _G['ADDON_LOADER']['cwapi'] = function() 	
 	-- executing onload
-	cwAPI.events.on('UI_CHAT',parseMessage,true);
+	cwAPI.events.on('UI_CHAT',parseMessage,0);
 	cwAPI.commands.register('/script',runScript);
 	cwAPI.commands.register('/addons',showAddonsButton);
 	cwAPI.commands.register('/reload',reloadAddons);
 	cwAPI.commands.register('/cw',checkCommand);	
 	cwAPI.util.log('[cwAPI:help] /cw');
-
 	return true;
 end 
+
+

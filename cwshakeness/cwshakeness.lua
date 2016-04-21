@@ -6,7 +6,7 @@ local settings = {};
 settings.devMode = false;
 
 settings.origname = 'cwShakeness_originalShockwave';
-settings.maxEnabled = 4;
+settings.maxEnabled = 1;
 
 -- ======================================================
 --	storing

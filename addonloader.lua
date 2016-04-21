@@ -3,6 +3,24 @@
 -- ======================================================
 
 _G["ADDON_LOADER"] = {};
+local debugLoading = true;
+
+local function trydofile(fullpath)
+	local f = io.open(fullpath,"r");
+	if (f ~= nil) then
+		io.close(f);
+		dofile(fullpath);
+		return true;
+	end
+	return false;
+end
+
+-- ======================================================
+--	Fix to make this loader compatible with Excrulon addons
+-- ======================================================
+
+local fullpath = '../addons/utility.lua';
+trydofile(fullpath);
 
 -- ======================================================
 --	load_all function
@@ -19,22 +37,23 @@ _G["ADDON_LOAD_ALL"] = function()
 	-- iterating all folders
 	local i, addons, popen = 0, {}, io.popen;
 	for filename in popen('dir "'..directory..'" /b /ad'):lines() do
-	   	-- checking if there is {folder}/{folder}.lua inside it
+		if (debugLoading) then ui.SysMsg('- '..filename); end
+	   	-- checking if there is {folder}/{folder}.lua inside it, and dofile-ing it if there is
 	   	local fullpath = '../addons/'..filename..'/'..filename..'.lua';
-		local f = io.open(fullpath,"r");
-	   	if f ~= nil then 
-	   		io.close(f); 
-	   		-- if there is, we'll store this folder 
+	   	local loaded = trydofile(fullpath);	   	
+	   	-- if there is, we'll store this folder 
+	   	if (loaded) then
 	   		i = i + 1;
 	   		addons[i] = filename;
-	   		-- and also dofile it to store all global functions it might have
-	   		dofile(fullpath); 
 	   	end
 	end
 
+	ui.SysMsg('Initializing Addons...');
+
 	-- now, with all the folders that have a {folder}.lua file inside it
 	for i,filename in pairs(addons) do
-		-- we look for a hook on the ADDON_LOADER globla
+		if (debugLoading) then ui.SysMsg('- '..filename); end
+		-- we look for a hook on the ADDON_LOADER global
 		local fn = _G['ADDON_LOADER'][filename];
 		local ok = true;
 		-- and if there is one, we'll call it

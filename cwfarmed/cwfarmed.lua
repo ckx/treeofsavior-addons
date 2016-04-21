@@ -8,54 +8,34 @@ settings.devMode = false;
 settings.silverID = 900011;
 settings.zenny = 0;
 settings.items = {};
+settings.items[settings.silverID] = 0;
 
 -- ======================================================
 --	on item update
 -- ======================================================
 
 local function refreshZeny() 
-	local invframe = ui.GetFrame("inventory");
-	local fn = _G['DRAW_TOTAL_VIS'];
-	fn(invframe,'invenZeny'); 
-end
+	local zeny = GET_TOTAL_MONEY();
+	local frame = ui.GetFrame("inventory");
+	local bottomGbox = frame:GetChild('bottomGbox');
+	local moneyGbox	= bottomGbox:GetChild('moneyGbox');
+	local INVENTORY_CronCheck = GET_CHILD(moneyGbox, 'invenZeny', 'ui::CRichText');
+
+	local farmedZeny = settings.items[settings.silverID];
+	local bothZeny = GetCommaedText(zeny)..' | '..GetCommaedText(farmedZeny);
+    INVENTORY_CronCheck:SetText('{@st41b}'..bothZeny);
+end 
 
 local function inventoryUpdate(actor,evName,itemID,itemQty)
 	local itemID = math.floor(itemID);
-
 	-- if the item is not stored, we'll start it
-	if (not settings.items[itemID]) then 
-		settings.items[itemID] = 0; 		
-	end
-
+	if (not settings.items[itemID]) then settings.items[itemID] = 0; end
 	-- adding the itemQty to the total stored
 	settings.items[itemID] = settings.items[itemID]+itemQty;
-
-	-- if this is a silver add, lets update the UI
-	if (itemID == settings.silverID) then refreshZeny() end
-end
-
--- ======================================================
---	on get commaed text
--- ======================================================
-
-local function fioGetCommaedText(qtZeny)
-	settings.zenny = qtZeny;
-	local fn = cwAPI.events.original('GetCommaedText');
-	local ret = fn(settings.zenny);
-	local farmed = settings.items[settings.silverID];
-	if (farmed) then ret = ret .. " | "..fn(farmed); end
-	return ret;
-end
-
-local function checkDrawVisible(actor,evName)
-	if (evName == 'invenZeny') then
-		-- changing the getcommaed function so it will add the earned zenny
-		cwAPI.events.on('GetCommaedText',fioGetCommaedText,true);
-		-- firing the original draw visible
-		local fn = cwAPI.events.original('DRAW_TOTAL_VIS');
-		fn(actor,evName); 
-		-- resting the getcommaed so nothing else will be affected
-		cwAPI.events.reset('GetCommaedText');
+	-- if this is a silver update, we'll refresh the zeny
+	if (itemID == settings.silverID) then 
+		cwAPI.util.log('[Silver] x'..itemQty..' acquired.');
+		refreshZeny(); 
 	end
 end
 
@@ -96,9 +76,11 @@ _G['ADDON_LOADER']['cwfarmed'] = function()
 		return false;
 	end
 	-- executing onload
-	cwAPI.events.on('ITEMMSG_ITEM_COUNT',inventoryUpdate);
-	cwAPI.events.on('DRAW_TOTAL_VIS',checkDrawVisible,true);
+	cwAPI.events.on('ITEMMSG_ITEM_COUNT',inventoryUpdate,1);
+	cwAPI.events.on('DRAW_TOTAL_VIS',refreshZeny,1);
+
 	cwAPI.commands.register('/farmed',checkCommand);
 	cwAPI.util.log('[cwFarmed:help] /farmed');
 	return true;
 end
+
