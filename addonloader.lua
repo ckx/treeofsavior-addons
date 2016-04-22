@@ -3,7 +3,7 @@
 -- ======================================================
 
 _G["ADDON_LOADER"] = {};
-local debugLoading = true;
+local debugLoading = false;
 
 local function trydofile(fullpath)
 	local f = io.open(fullpath,"r");
