@@ -2,7 +2,11 @@
 
 Here you can find all the addons I've created. Feel free to use my cwAPI to create yours too! Ask me if you need help.
 
-#### cwFarmed: 
+## Download ##
+
+<a href='https://github.com/fiote/treeofsavior-addons/releases'>Get the latest release here</a>
+
+## cwFarmed
 [depends on cwAPI, help avaiable at https://github.com/fiote/treeofsavior-addons/wiki/cwFarmed]
 
 Display how much silver you have grinded from mobs in the current section.
@@ -20,21 +24,17 @@ Display the ammount of XP each monster awarded you.
 <img src='http://i.imgur.com/fr20ksB.png'>
 
 
-#### cwShakeness:
+## cwShakeness
 [depends on cwAPI]
 
 A tiny addon that disables the 'shake' the games used on certain skills. I read users having headaches and nauseas because of that, so I thought it would be nice being able to disable them while ICM doesn't get us a solution.
 
 Type /skn for help.
 
-#### cwAPI: 
+## cwAPI
 An API of core functionalities.
 
 Type /cw for help.
-
-## Download ##
-
-<a href='https://github.com/fiote/treeofsavior-addons/releases'>Get the latest release here</a>
 
 ## Installation ##
 
