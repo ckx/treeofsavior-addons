@@ -12,10 +12,15 @@ settings.show.silver = true;
 settings.silverID = 900011;
 settings.zenny = 0;
 
-settings.xpbase = {};
-settings.xpbase.now = session.GetEXP();
-settings.xpbase.gain = 0;
-settings.xpbase.pralert = 0.01;
+settings.resetXP = function()
+	settings.xpbase = {};
+	settings.xpbase.now = session.GetEXP();
+	settings.xpbase.gain = 0;
+	settings.xpbase.qtmobs = 0;
+	settings.xpbase.pralert = 0.01;
+end
+
+settings.resetXP();
 
 settings.xpclass = 0;
 
@@ -55,18 +60,26 @@ end
 --	on char base update
 -- ======================================================
 
-local function charbaseUpdate() 
+local function charbaseUpdate(frame, msg) 
+	if (msg == 'LEVEL_UPDATE') then
+		settings.resetXP();
+	end
+
 	if (settings.show.xp) then 
 		local newxp = session.GetEXP();
 		local diff = newxp - settings.xpbase.now;
 		if (diff > 0) then 
+			settings.xpbase.qtmobs = settings.xpbase.qtmobs+1;
 			settings.xpbase.gain = settings.xpbase.gain + diff;
 			local max = session.GetMaxEXP();
 			local prgain = settings.xpbase.gain/max * 100;
 			if (prgain >= settings.xpbase.pralert) then
-				local dspr = string.format("%.2f%%", prgain, 100.0);
-				cwAPI.util.log('[XPbase] x '..dspr..' acquired');
+				local dspr = string.format("%.3f%%", prgain, 100.0);
+				local pts = settings.xpbase.gain..' pts';
+				if (settings.xpbase.qtmobs > 1) then pts = pts .. '/'..settings.xpbase.qtmobs..' mobs'; end
+				cwAPI.util.log('[XPbase] +'..dspr..' ('..pts..').');
 				settings.xpbase.gain = 0;
+				settings.xpbase.qtmobs = 0;
 			end
 			settings.xpbase.now = newxp;
 		end
@@ -107,9 +120,10 @@ local function checkCommand(words)
 
 	if (cmd == 'xpmin') then
 		local newpr = table.remove(words,1);
-		local dspr = string.format("%.2f",newpr, 0.1);
+		settings.resetXP();
+		settings.xpbase.pralert = tonumber(newpr);
+		local dspr = string.format("%.3f",settings.xpbase.pralert, 0.1);
 		local msgflag = 'Min XP set to ['..dspr..'%].';
-		settings.xpbase.pralert = tonumber(dspr);
 		return ui.MsgBox(msgtitle..msgflag);
 	end
 
