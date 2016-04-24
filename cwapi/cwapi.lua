@@ -43,38 +43,6 @@ function getvarvalue(var)
 end
 
 -- ======================================================
---	MONSTER	
--- ======================================================
-
-cwAPI.monster = {};
-function cwAPI.monster.getWiki(monID) 
-	local monCls = GetClassByType("Monster",monID);
-	if (monCls == nil) then return nil; end
-	local wiki = GetWikiByName(monCls.Journal);
-	return wiki;
-end
-
-function cwAPI.monster.getProp(monID,propName)
-	local wiki = cwAPI.monster.getWiki(monID);
-	if (wiki == nil) then return nil; end
-	return GetWikiIntProp(wiki,propName);
-end
-
-function cwAPI.monster.getExp(monID)
-	return cwAPI.monster.getProp(monID,'Exp');
-end
-
--- ======================================================
---	TARGET
--- ======================================================
-
-cwAPI.target = {};
-
-function cwAPI.target.get() 
-	return world.GetActor(session.GetTargetHandle());
-end
-
--- ======================================================
 --	EVENTS
 -- ======================================================
 
@@ -254,6 +222,7 @@ _G['ADDON_LOADER']['cwapi'] = function()
 	cwAPI.commands.register('/reload',reloadAddons);
 	cwAPI.commands.register('/cw',checkCommand);	
 	cwAPI.util.log('[cwAPI:help] /cw');
+
 	return true;
 end 
 

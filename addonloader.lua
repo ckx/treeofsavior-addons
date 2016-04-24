@@ -4,6 +4,7 @@
 
 _G["ADDON_LOADER"] = {};
 local debugLoading = false;
+local closeAfter = true;
 
 local function trydofile(fullpath)
 	local f = io.open(fullpath,"r");
@@ -37,15 +38,16 @@ _G["ADDON_LOAD_ALL"] = function()
 	-- iterating all folders
 	local i, addons, popen = 0, {}, io.popen;
 	for filename in popen('dir "'..directory..'" /b /ad'):lines() do
-		if (debugLoading) then ui.SysMsg('- '..filename); end
+
 	   	-- checking if there is {folder}/{folder}.lua inside it, and dofile-ing it if there is
+		if (debugLoading) then ui.SysMsg('- '..filename..' (lua)'); end
 	   	local fullpath = '../addons/'..filename..'/'..filename..'.lua';
 	   	local loaded = trydofile(fullpath);	   	
 	   	-- if there is, we'll store this folder 
 	   	if (loaded) then
 	   		i = i + 1;
 	   		addons[i] = filename;
-	   	end
+	   	end	   	
 	end
 
 	ui.SysMsg('Initializing Addons...');
@@ -70,7 +72,7 @@ end
 -- ======================================================
 
 _G['ADDON_LOAD_ALL']();
-_G["ADDON_LOADER"]["LOADED"] = true;
+_G["ADDON_LOADER"]["LOADED"] = closeAfter;
 
 -- ======================================================
 -- showing the addonloader frame
@@ -100,3 +102,5 @@ if _G["MAP_ON_INIT_OLD"] == nil then
 else
 	_G[mapOnInitHook] = MAP_ON_INIT_HOOKED;
 end
+
+if (not closeAfter) then addonLoaderFrame:ShowWindow(1); end
