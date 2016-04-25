@@ -7,8 +7,8 @@ Here you can find all the addons I've created. Feel free to use my cwAPI to crea
 <a href='https://github.com/fiote/treeofsavior-addons/releases'>Get the latest release here</a>
 
 ## cwFarmed
-![Addon Safe](https://cdn.rawgit.com/lubien/awesome-tos/master/badges/addon-safe.svg)
-![Addon Status Unknown](https://cdn.rawgit.com/lubien/awesome-tos/master/badges/addon-unknown.svg)
+[![Addon Safe](https://cdn.rawgit.com/lubien/awesome-tos/master/badges/addon-safe.svg)](https://github.com/lubien/awesome-tos#addons-badges)
+[![Addon Status Unknown](https://cdn.rawgit.com/lubien/awesome-tos/master/badges/addon-unknown.svg)](https://github.com/lubien/awesome-tos#addons-badges)
 
 [depends on cwAPI, help avaiable at https://github.com/fiote/treeofsavior-addons/wiki/cwFarmed]
 
@@ -28,8 +28,8 @@ Display the ammount of XP each monster awarded you.
 
 
 ## cwShakeness
-![Addon Safe](https://cdn.rawgit.com/lubien/awesome-tos/master/badges/addon-safe.svg)
-![Addon Status Unknown](https://cdn.rawgit.com/lubien/awesome-tos/master/badges/addon-unknown.svg)
+[![Addon Safe](https://cdn.rawgit.com/lubien/awesome-tos/master/badges/addon-safe.svg)](https://github.com/lubien/awesome-tos#addons-badges)
+[![Addon Status Unknown](https://cdn.rawgit.com/lubien/awesome-tos/master/badges/addon-unknown.svg)](https://github.com/lubien/awesome-tos#addons-badges)
 
 [depends on cwAPI]
 
@@ -38,8 +38,8 @@ A tiny addon that disables the 'shake' the games used on certain skills. I read 
 Type /skn for help.
 
 ## cwAPI
-![Addon Safe](https://cdn.rawgit.com/lubien/awesome-tos/master/badges/addon-safe.svg)
-![Addon Status Unknown](https://cdn.rawgit.com/lubien/awesome-tos/master/badges/addon-unknown.svg)
+[![Addon Safe](https://cdn.rawgit.com/lubien/awesome-tos/master/badges/addon-safe.svg)](https://github.com/lubien/awesome-tos#addons-badges)
+[![Addon Status Unknown](https://cdn.rawgit.com/lubien/awesome-tos/master/badges/addon-unknown.svg)](https://github.com/lubien/awesome-tos#addons-badges)
 
 An API of core functionalities.
 
