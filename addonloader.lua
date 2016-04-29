@@ -2,26 +2,34 @@
 --	begin
 -- ======================================================
 
+ui.SysMsg('=====================================');
+
 _G["ADDON_LOADER"] = {};
 local debugLoading = false;
-local closeAfter = true;
+local closeAfter = false;
 
 local function trydofile(fullpath)
-	local f = io.open(fullpath,"r");
+	local f, error = io.open(fullpath,"r");
 	if (f ~= nil) then
 		io.close(f);
 		dofile(fullpath);
 		return true;
+	else 
+		return false;
 	end
-	return false;
 end
 
 -- ======================================================
 --	Fix to make this loader compatible with Excrulon addons
 -- ======================================================
 
-local fullpath = '../addons/utility.lua';
-trydofile(fullpath);
+trydofile('../addons/utility.lua');
+
+-- ======================================================
+--	JSON library (to work with setting files)
+-- ======================================================
+
+JSON = (loadfile "../addons/JSON.lua")();
 
 -- ======================================================
 --	load_all function
@@ -29,7 +37,7 @@ trydofile(fullpath);
 
 _G["ADDON_LOAD_ALL"] = function()
 
-	ui.SysMsg('Loading Addons...');
+	ui.SysMsg('Opening addon folders...');
 
 	-- getting the current directory 
 	local info = debug.getinfo(1,'S');
@@ -47,10 +55,10 @@ _G["ADDON_LOAD_ALL"] = function()
 	   	if (loaded) then
 	   		i = i + 1;
 	   		addons[i] = filename;
-	   	end	   	
+	   	end	  
 	end
 
-	ui.SysMsg('Initializing Addons...');
+	ui.SysMsg('Initializing addons...');
 
 	-- now, with all the folders that have a {folder}.lua file inside it
 	for i,filename in pairs(addons) do
@@ -83,24 +91,17 @@ addonLoaderFrame:Move(0, 0);
 addonLoaderFrame:SetOffset(450, 30);
 addonLoaderFrame:ShowWindow(0);
 
-function MAP_ON_INIT_HOOKED(addon, frame)
-	_G["MAP_ON_INIT_OLD"](addon, frame);
+-- ======================================================
+-- hooking it on map-init
+-- ======================================================
+
+function initWithAddons()
 	if _G["ADDON_LOADER"]["LOADED"] then
 		local addonLoaderFrame = ui.GetFrame("addonloader");
 		addonLoaderFrame:ShowWindow(0);
 	end
 end
 
--- ======================================================
--- hooking it on map-init
--- ======================================================
-
-local mapOnInitHook = "MAP_ON_INIT";
-if _G["MAP_ON_INIT_OLD"] == nil then
-	_G["MAP_ON_INIT_OLD"] = _G[mapOnInitHook];
-	_G[mapOnInitHook] = MAP_ON_INIT_HOOKED;
-else
-	_G[mapOnInitHook] = MAP_ON_INIT_HOOKED;
-end
+cwAPI.events.on('MAP_ON_INIT',initWithAddons,1);
 
 if (not closeAfter) then addonLoaderFrame:ShowWindow(1); end

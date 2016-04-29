@@ -2,7 +2,14 @@
 
 Here you can find all the addons I've created. Feel free to use my cwAPI to create yours too! Ask me if you need help.
 
-#### cwFarmed: 
+## Download ##
+
+<a href='https://github.com/fiote/treeofsavior-addons/releases'>Get the latest release here</a>
+
+## cwFarmed
+[![Addon Safe](https://cdn.rawgit.com/lubien/awesome-tos/master/badges/addon-safe.svg)](https://github.com/lubien/awesome-tos#addons-badges)
+[![Addon Status Unknown](https://cdn.rawgit.com/lubien/awesome-tos/master/badges/addon-unknown.svg)](https://github.com/lubien/awesome-tos#addons-badges)
+
 [depends on cwAPI, help avaiable at https://github.com/fiote/treeofsavior-addons/wiki/cwFarmed]
 
 Display how much silver you have grinded from mobs in the current section.
@@ -19,22 +26,39 @@ Display the ammount of XP each monster awarded you.
 
 <img src='http://i.imgur.com/fr20ksB.png'>
 
+## cwCleric
+[![Addon Safe](https://cdn.rawgit.com/lubien/awesome-tos/master/badges/addon-safe.svg)](https://github.com/lubien/awesome-tos#addons-badges)
+[![Addon Status Unknown](https://cdn.rawgit.com/lubien/awesome-tos/master/badges/addon-unknown.svg)](https://github.com/lubien/awesome-tos#addons-badges)
 
-#### cwShakeness:
+[depends on cwAPI]
+
+This addon acts as a class helper. If you have your "Heal: Remove Damage" attribute OFF and join a party, it will ask if you want to toggle it ON (so you can heal better). When you leave a party while having the attibute ON, it will ask if you want to toggle it OFF (so you can do more damage while soloing).
+
+<img src='http://i.imgur.com/k2hipF4.png'>
+
+<img src='http://i.imgur.com/8hMvkiZ.png'>
+
+## cwShakeness
+[![Addon Safe](https://cdn.rawgit.com/lubien/awesome-tos/master/badges/addon-safe.svg)](https://github.com/lubien/awesome-tos#addons-badges)
+[![Addon Status Unknown](https://cdn.rawgit.com/lubien/awesome-tos/master/badges/addon-unknown.svg)](https://github.com/lubien/awesome-tos#addons-badges)
+
 [depends on cwAPI]
 
 A tiny addon that disables the 'shake' the games used on certain skills. I read users having headaches and nauseas because of that, so I thought it would be nice being able to disable them while ICM doesn't get us a solution.
 
 Type /skn for help.
 
-#### cwAPI: 
+## cwAPI
+[![Addon Safe](https://cdn.rawgit.com/lubien/awesome-tos/master/badges/addon-safe.svg)](https://github.com/lubien/awesome-tos#addons-badges)
+[![Addon Status Unknown](https://cdn.rawgit.com/lubien/awesome-tos/master/badges/addon-unknown.svg)](https://github.com/lubien/awesome-tos#addons-badges)
+
 An API of core functionalities.
 
+Enables you to hook on events and decide if you custom function will be called before, after or instead of the original callback.
+
+Enables you to load addon json as tables and save them back to the file (useful to persist user options).
+
 Type /cw for help.
-
-## Download ##
-
-<a href='https://github.com/fiote/treeofsavior-addons/releases'>Get the latest release here</a>
 
 ## Installation ##
 

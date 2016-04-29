@@ -38,7 +38,16 @@ end
 function getvarvalue(var)
 	if (var == nil) then return 'nil'; end	
 	local tp = type(var); 
-	if (tp == 'string' or tp == 'number') then return var; end
+	if (tp == 'string' or tp == 'number') then 
+		return var; 
+	end
+	if (tp == 'boolean') then 
+		if (var) then 
+			return 'true';
+		else
+			return 'false';
+		end
+	end
 	return tp;
 end
 
@@ -174,6 +183,98 @@ end
 local parseMessage = function(message) cwAPI.commands.parseMessage(message); end
 
 -- ======================================================
+--	JSONs
+-- ======================================================
+
+cwAPI.json = {};
+
+function cwAPI.json.load(name)
+	local file, error = io.open("../addons/"..name.."/"..name..".json", "r");
+	if (error) then
+		ui.SysMsg("Error opening "..name.." to load json: "..error);
+		return null;
+	else 
+	    local filestring = file:read("*all");
+	    local filetable = JSON:decode(filestring);    
+	    io.close(file);
+	    return filetable;
+	end
+end
+
+function cwAPI.json.save(name,filetable)
+	local file, error = io.open("../addons/"..name.."/"..name..".json", "w");
+	if (error) then
+		ui.SysMsg("Error opening "..name.." to write json: "..error);
+		return false;
+	else 
+		local filestring = JSON:encode_pretty(filetable);
+		file:write(filestring);
+	    io.close(file);
+	    return true;
+	end
+end
+
+-- ======================================================
+--	ATTRIBUTES
+-- ======================================================
+
+cwAPI.attributes = {};
+
+function cwAPI.attributes.getData(attrID)
+	local topFrame = ui.GetFrame('skilltree');
+	topFrame:SetUserValue("CLICK_ABIL_ACTIVE_TIME",imcTime.GetAppTime()-10);
+
+	-- geting the attribute instance
+	local abil = session.GetAbility(attrID);
+	if (not abil) then cwAPI.util.log('Unable to get attribute data: Attribute not found.'); return; end
+
+	-- loading its IES data
+	local abilClass = GetIES(abil:GetObject());
+
+	-- getting its name and ID	
+	local abilName = abilClass.ClassName;
+	local abilID = abilClass.ClassID;
+
+	-- getting the current state
+	local state = abilClass.ActiveState;
+
+	-- returning it
+	return abilName, abilID, state;
+end
+
+function cwAPI.attributes.toggleOff(attrID)
+	local abilName, abilID, state = cwAPI.attributes.getData(attrID);
+	cwAPI.util.dev('Disabling ['..abilName..']...',cwAPI.devMode);
+
+	-- if the attribute is already disabled, there's nothing to do
+	if (state == 0) then
+		cwAPI.util.dev('The attribute is already disabled.',cwAPI.devMode);
+		return; 
+	end 
+
+	-- calling the toggle function
+	local fn = _G['TOGGLE_ABILITY_ACTIVE'];
+	fn(nil, nil, abilName, abilID);
+	cwAPI.util.dev('Attibute disabled.',cwAPI.devMode);
+end
+
+function cwAPI.attributes.toggleOn(attrID)
+	local abilName, abilID, state = cwAPI.attributes.getData(attrID);
+	cwAPI.util.dev('Enabling ['..abilName..']...',cwAPI.devMode);
+
+	-- if the attribute is already disabled, there's nothing to do
+	if (state == 1) then
+		cwAPI.util.dev('The attribute is already enabled.',cwAPI.devMode);
+		return; 
+	end 
+
+	-- calling the toggle function
+	local fn = _G['TOGGLE_ABILITY_ACTIVE'];
+	fn(nil, nil, abilName, abilID);
+	cwAPI.util.dev('Attibute enabled.',cwAPI.devMode);
+end
+
+-- ======================================================
 --	commands
 -- ======================================================
 
@@ -211,18 +312,15 @@ end
 -- ======================================================
 
 cwAPI.events.resetAll();
-
-
+cwAPI.events.on('UI_CHAT',parseMessage,0);
+cwAPI.commands.register('/addons',showAddonsButton);
+cwAPI.commands.register('/reload',reloadAddons);
 
 _G['ADDON_LOADER']['cwapi'] = function() 	
 	-- executing onload
-	cwAPI.events.on('UI_CHAT',parseMessage,0);
 	cwAPI.commands.register('/script',runScript);
-	cwAPI.commands.register('/addons',showAddonsButton);
-	cwAPI.commands.register('/reload',reloadAddons);
 	cwAPI.commands.register('/cw',checkCommand);	
 	cwAPI.util.log('[cwAPI:help] /cw');
-
 	return true;
 end 
 

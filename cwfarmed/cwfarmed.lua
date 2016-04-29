@@ -1,31 +1,34 @@
 -- ======================================================
+--	options
+-- ======================================================
+
+local options = cwAPI.json.load("cwfarmed");
+
+-- ======================================================
 --	settings
 -- ======================================================
 
 local settings = {};
+
 settings.devMode = false;
-
-settings.show = {};
-settings.show.xp = true;
-settings.show.silver = true;
-
 settings.silverID = 900011;
+
+-- current zeny
 settings.zenny = 0;
 
+-- items farmed so far
+settings.items = {};
+settings.items[settings.silverID] = 0;
+
+-- function to reset xp values (usually after a level up)
 settings.resetXP = function()
 	settings.xpbase = {};
 	settings.xpbase.now = session.GetEXP();
 	settings.xpbase.gain = 0;
 	settings.xpbase.qtmobs = 0;
-	settings.xpbase.pralert = 0.01;
 end
 
 settings.resetXP();
-
-settings.xpclass = 0;
-
-settings.items = {};
-settings.items[settings.silverID] = 0;
 
 -- ======================================================
 --	on item update
@@ -51,7 +54,7 @@ local function inventoryUpdate(actor,evName,itemID,itemQty)
 	settings.items[itemID] = settings.items[itemID]+itemQty;
 	-- if this is a silver update, we'll refresh the zeny
 	if (itemID == settings.silverID) then 
-		if (settings.show.silver) then cwAPI.util.log('[Silver] x '..itemQty..' acquired.'); end
+		if (options.show.silver) then cwAPI.util.log('[Silver] x '..itemQty..' acquired.'); end
 		refreshZeny(); 
 	end
 end
@@ -65,7 +68,7 @@ local function charbaseUpdate(frame, msg)
 		settings.resetXP();
 	end
 
-	if (settings.show.xp) then 
+	if (options.show.xp) then 
 		local newxp = session.GetEXP();
 		local diff = newxp - settings.xpbase.now;
 		if (diff > 0) then 
@@ -73,7 +76,7 @@ local function charbaseUpdate(frame, msg)
 			settings.xpbase.gain = settings.xpbase.gain + diff;
 			local max = session.GetMaxEXP();
 			local prgain = settings.xpbase.gain/max * 100;
-			if (prgain >= settings.xpbase.pralert) then
+			if (prgain >= options.minAlert.xp) then
 				local dspr = string.format("%.3f%%", prgain, 100.0);
 				local pts = settings.xpbase.gain..' pts';
 				if (settings.xpbase.qtmobs > 1) then pts = pts .. '/'..settings.xpbase.qtmobs..' mobs'; end
@@ -92,7 +95,6 @@ end
 
 local function checkCommand(words)
 	local cmd = table.remove(words,1);
-
 	local msgtitle = 'cwFarmed{nl}'..'-----------{nl}';
 
 	if (cmd == 'reset') then
@@ -104,34 +106,36 @@ local function checkCommand(words)
 
 	if (cmd == 'silver') then
 		local dsflag = table.remove(words,1);
-		if (dsflag == 'on') then settings.show.silver = true; end 
-		if (dsflag == 'off') then settings.show.silver = false; end 
+		if (dsflag == 'on') then options.show.silver = true; end 
+		if (dsflag == 'off') then options.show.silver = false; end 
 		local msgflag = 'Show silver set to ['..dsflag..'].';
-		return ui.MsgBox(msgtitle..msgflag);
+		cwAPI.json.save("cwfarmed",options);
+		return ui.MsgBox(msgtitle..msgflag);		
 	end
 
 	if (cmd == 'xp') then
 		local dsflag = table.remove(words,1);
-		if (dsflag == 'on') then settings.show.xp = true; end 
-		if (dsflag == 'off') then settings.show.xp = false; end 
+		if (dsflag == 'on') then options.show.xp = true; end 
+		if (dsflag == 'off') then options.show.xp = false; end 
 		local msgflag = 'Show XP set to ['..dsflag..'].';
+		cwAPI.json.save("cwfarmed",options);
 		return ui.MsgBox(msgtitle..msgflag);
 	end
 
 	if (cmd == 'xpmin') then
 		local newpr = table.remove(words,1);
 		settings.resetXP();
-		settings.xpbase.pralert = tonumber(newpr);
-		local dspr = string.format("%.3f",settings.xpbase.pralert, 0.1);
+		options.minAlert.xp = tonumber(newpr);
+		local dspr = string.format("%.3f",options.minAlert.xp, 0.1);
 		local msgflag = 'Min XP set to ['..dspr..'%].';
+		cwAPI.json.save("cwfarmed",options);
 		return ui.MsgBox(msgtitle..msgflag);
 	end
 
 	if (not cmd) then
-		local dssilver = ''; if (settings.show.silver) then dssilver = 'on'; else dssilver = 'off'; end
-		local dsxp = ''; if (settings.show.xp) then dsxp = 'on'; else dsxp = 'off'; end
-
-		local dspr = string.format("%.2f%%",settings.xpbase.pralert, 0.1);
+		local dssilver = ''; if (options.show.silver) then dssilver = 'on'; else dssilver = 'off'; end
+		local dsxp = ''; if (options.show.xp) then dsxp = 'on'; else dsxp = 'off'; end
+		local dspr = string.format("%.2f%%",options.minAlert.xp, 0.1);
 
 		local msgcmd = '';
 		local msgcmd = msgcmd .. '/farmed silver [on/off]{nl}'..'Show or hide silver messages (now: '..dssilver..').{nl}'..'-----------{nl}';
@@ -166,4 +170,3 @@ _G['ADDON_LOADER']['cwfarmed'] = function()
 	cwAPI.util.log('[cwFarmed:help] /farmed');
 	return true;
 end
-
