@@ -226,7 +226,7 @@ function cwAPI.attributes.getData(attrID)
 
 	-- geting the attribute instance
 	local abil = session.GetAbility(attrID);
-	if (not abil) then cwAPI.util.log('Unable to get attribute data: Attribute not found.'); return; end
+	if (not abil) then return nil; end
 
 	-- loading its IES data
 	local abilClass = GetIES(abil:GetObject());

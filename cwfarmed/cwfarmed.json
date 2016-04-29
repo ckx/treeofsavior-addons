@@ -1,10 +1,10 @@
 {
   "minAlert": {
     "silver": 0,
-    "xp": 0.5
+    "xp": 0
   },
   "show": {
     "silver": true,
-    "xp": false
+    "xp": true
   }
 }
