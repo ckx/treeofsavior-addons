@@ -6,7 +6,7 @@ ui.SysMsg('=====================================');
 
 _G["ADDON_LOADER"] = {};
 local debugLoading = false;
-local closeAfter = false;
+local closeAfter = true;
 
 local function trydofile(fullpath)
 	local f, error = io.open(fullpath,"r");
