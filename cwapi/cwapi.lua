@@ -70,19 +70,20 @@ function cwAPI.events.on(event,callback,order)
 
 	cwAPI.events.store(event);
 
-	_G[event] = function(a,b,c,d,e,f,g)
+	_G[event] = function(...)
+		local t = {...};
 		if (order == -1) then
-			callback(a,b,c,d,e,f,g);
+			callback(unpack(t));
 		end
 		if (order ~= 0) then
 			local fn = cwAPI.events.original(event);
-			local ret = fn(a,b,c,d,e,f,g);
+			local ret = fn(unpack(t));
 		end
 		if (order == 0) then			
-			local ret = callback(a,b,c,d,e,f,g);
+			local ret = callback(unpack(t));
 		end
 		if (order == 1) then
-			callback(a,b,c,d,e,f,g);
+			callback(unpack(t));
 		end
 
 		return ret;
@@ -252,6 +253,9 @@ function cwAPI.attributes.toggleOff(attrID)
 		return; 
 	end 
 
+	local topFrame = ui.GetFrame('skilltree');
+	topFrame:SetUserValue("CLICK_ABIL_ACTIVE_TIME",imcTime.GetAppTime()-10);
+
 	-- calling the toggle function
 	local fn = _G['TOGGLE_ABILITY_ACTIVE'];
 	fn(nil, nil, abilName, abilID);
@@ -267,6 +271,9 @@ function cwAPI.attributes.toggleOn(attrID)
 		cwAPI.util.dev('The attribute is already enabled.',cwAPI.devMode);
 		return; 
 	end 
+
+	local topFrame = ui.GetFrame('skilltree');
+	topFrame:SetUserValue("CLICK_ABIL_ACTIVE_TIME",imcTime.GetAppTime()-10);
 
 	-- calling the toggle function
 	local fn = _G['TOGGLE_ABILITY_ACTIVE'];
@@ -287,6 +294,7 @@ local function runScript(words)
 end
 
 local function reloadAddons()
+	ui.SysMsg('=====================================');
 	_G['ADDON_LOAD_ALL']();
 end
 
