@@ -6,6 +6,13 @@ Here you can find all the addons I've created. Feel free to use my cwAPI to crea
 
 <a href='https://github.com/fiote/treeofsavior-addons/releases'>Get the latest release here</a>
 
+## cwToLearn
+[![Addon Safe](https://cdn.rawgit.com/lubien/awesome-tos/master/badges/addon-safe.svg)](https://github.com/lubien/awesome-tos#addons-badges)
+[![Addon Status Unknown](https://cdn.rawgit.com/lubien/awesome-tos/master/badges/addon-unknown.svg)](https://github.com/lubien/awesome-tos#addons-badges)
+
+When selecting the "Show only attributes that can be learned" on the 'Learn Attributes' window, this addon will hide the attributes that you already have at max level.
+
+
 ## cwFarmed
 [![Addon Safe](https://cdn.rawgit.com/lubien/awesome-tos/master/badges/addon-safe.svg)](https://github.com/lubien/awesome-tos#addons-badges)
 [![Addon Status Unknown](https://cdn.rawgit.com/lubien/awesome-tos/master/badges/addon-unknown.svg)](https://github.com/lubien/awesome-tos#addons-badges)
