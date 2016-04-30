@@ -23,12 +23,9 @@ end
 
 settings.resetSilver = function() 
 	settings.silver = {};
+	settings.silver.farmed = 0;
 	settings.silver.gain = 0;
 end
-
-settings.resetXP();
-settings.resetSilver();
-
 
 -- ======================================================
 --	on item update
@@ -41,15 +38,16 @@ local function refreshZeny()
 	local moneyGbox	= bottomGbox:GetChild('moneyGbox');
 	local INVENTORY_CronCheck = GET_CHILD(moneyGbox, 'invenZeny', 'ui::CRichText');
 
-	local farmedZeny = settings.items[settings.silverID];
-	local bothZeny = GetCommaedText(zeny)..' | '..GetCommaedText(farmedZeny);
+	local bothZeny = GetCommaedText(zeny)..' | '..GetCommaedText(settings.silver.farmed);
     INVENTORY_CronCheck:SetText('{@st41b}'..bothZeny);
 end 
 
 local function inventoryUpdate(actor,evName,itemID,itemQty)
 	local itemID = math.floor(itemID);
 	-- if this is a silver update, we'll refresh the zeny
-	if (itemID == settings.silverID) then 		
+	if (itemID == settings.silverID) then 	
+		settings.silver.farmed = settings.silver.farmed + itemQty;
+
 		settings.silver.gain = settings.silver.gain + itemQty;		
 		if (settings.silver.gain >= options.minAlert.silver) then
 			cwAPI.util.log('[Silver] +'..GetCommaedText(settings.silver.gain)..' obtained.');
@@ -98,7 +96,7 @@ local function checkCommand(words)
 	local msgtitle = 'cwFarmed{nl}'..'-----------{nl}';
 
 	if (cmd == 'reset') then
-		settings.items = {};
+		settings.silver.farmed = 0;
 		refreshZeny();
 		local msgreset = 'Counter resetted successfully.';
 		return ui.MsgBox(msgtitle..msgreset);
@@ -115,7 +113,6 @@ local function checkCommand(words)
 
 	if (cmd == 'silvermin') then
 		local newvlr = table.remove(words,1);
-		settings.resetSilver();
 		options.minAlert.silver = tonumber(newvlr);
 		local dspr = string.format("%d",options.minAlert.silver, 1);
 		local msgflag = 'Min Silver alert set to ['..dspr..' coins].';
@@ -175,6 +172,10 @@ _G['ADDON_LOADER']['cwfarmed'] = function()
 		ui.SysMsg('[cwFarmed] requires cwAPI to run.');
 		return false;
 	end
+
+	settings.resetXP();
+	settings.resetSilver();
+
 	-- executing onload
 	cwAPI.events.on('ITEMMSG_ITEM_COUNT',inventoryUpdate,1);
 	cwAPI.events.on('DRAW_TOTAL_VIS',refreshZeny,1);
