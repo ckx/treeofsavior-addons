@@ -13,13 +13,6 @@ local settings = {};
 settings.devMode = false;
 settings.silverID = 900011;
 
--- current zeny
-settings.zenny = 0;
-
--- items farmed so far
-settings.items = {};
-settings.items[settings.silverID] = 0;
-
 -- function to reset xp values (usually after a level up)
 settings.resetXP = function()
 	settings.xpbase = {};
@@ -28,7 +21,14 @@ settings.resetXP = function()
 	settings.xpbase.qtmobs = 0;
 end
 
+settings.resetSilver = function() 
+	settings.silver = {};
+	settings.silver.gain = 0;
+end
+
 settings.resetXP();
+settings.resetSilver();
+
 
 -- ======================================================
 --	on item update
@@ -48,13 +48,13 @@ end
 
 local function inventoryUpdate(actor,evName,itemID,itemQty)
 	local itemID = math.floor(itemID);
-	-- if the item is not stored, we'll start it
-	if (not settings.items[itemID]) then settings.items[itemID] = 0; end
-	-- adding the itemQty to the total stored
-	settings.items[itemID] = settings.items[itemID]+itemQty;
 	-- if this is a silver update, we'll refresh the zeny
-	if (itemID == settings.silverID) then 
-		if (options.show.silver) then cwAPI.util.log('[Silver] x '..itemQty..' acquired.'); end
+	if (itemID == settings.silverID) then 		
+		settings.silver.gain = settings.silver.gain + itemQty;		
+		if (settings.silver.gain >= options.minAlert.silver) then
+			cwAPI.util.log('[Silver] +'..GetCommaedText(settings.silver.gain)..' obtained.');
+			settings.silver.gain = 0;
+		end
 		refreshZeny(); 
 	end
 end
@@ -113,11 +113,21 @@ local function checkCommand(words)
 		return ui.MsgBox(msgtitle..msgflag);		
 	end
 
+	if (cmd == 'silvermin') then
+		local newvlr = table.remove(words,1);
+		settings.resetSilver();
+		options.minAlert.silver = tonumber(newvlr);
+		local dspr = string.format("%d",options.minAlert.silver, 1);
+		local msgflag = 'Min Silver alert set to ['..dspr..' coins].';
+		cwAPI.json.save("cwfarmed",options);
+		return ui.MsgBox(msgtitle..msgflag);
+	end
+
 	if (cmd == 'xp') then
 		local dsflag = table.remove(words,1);
 		if (dsflag == 'on') then options.show.xp = true; end 
 		if (dsflag == 'off') then options.show.xp = false; end 
-		local msgflag = 'Show XP set to ['..dsflag..'].';
+		local msgflag = 'Show XP alert set to ['..dsflag..'].';
 		cwAPI.json.save("cwfarmed",options);
 		return ui.MsgBox(msgtitle..msgflag);
 	end
@@ -133,16 +143,20 @@ local function checkCommand(words)
 	end
 
 	if (not cmd) then
-		local dssilver = ''; if (options.show.silver) then dssilver = 'on'; else dssilver = 'off'; end
-		local dsxp = ''; if (options.show.xp) then dsxp = 'on'; else dsxp = 'off'; end
-		local dspr = string.format("%.2f%%",options.minAlert.xp, 0.1);
+		local flagsv = ''; if (options.show.silver) then flagsv = 'on'; else flagsv = 'off'; end
+		local alertsv = options.minAlert.silver;
+
+		local flagxp = ''; if (options.show.xp) then flagxp = 'on'; else flagxp = 'off'; end
+		local alertxp = string.format("%.2f%%",options.minAlert.xp, 0.1);
 
 		local msgcmd = '';
-		local msgcmd = msgcmd .. '/farmed silver [on/off]{nl}'..'Show or hide silver messages (now: '..dssilver..').{nl}'..'-----------{nl}';
 		local msgcmd = msgcmd .. '/farmed reset{nl}'..'Reset the silver counting.{nl}'..'-----------{nl}';
 
-		local msgcmd = msgcmd .. '/farmed xp [on/off]{nl}'..'Show or hide xp messages (now: '..dsxp..').{nl}'..'-----------{nl}';
-		local msgcmd = msgcmd .. '/farmed xpmin [value]{nl}'..'Only show xp messages when x% is obtained (now: '..dspr..').{nl}'..'-----------{nl}';
+		local msgcmd = msgcmd .. '/farmed silver [on/off]{nl}'..'Show or hide silver messages (now: '..flagsv..').{nl}'..'-----------{nl}';
+		local msgcmd = msgcmd .. '/farmed silvermin [value]{nl}'..'Only show silver messages when x is obtained (now: '..alertsv..').{nl}'..'-----------{nl}';
+
+		local msgcmd = msgcmd .. '/farmed xp [on/off]{nl}'..'Show or hide xp messages (now: '..flagxp..').{nl}'..'-----------{nl}';
+		local msgcmd = msgcmd .. '/farmed xpmin [value]{nl}'..'Only show xp messages when x% is obtained (now: '..alertxp..').{nl}'..'-----------{nl}';
 		return ui.MsgBox(msgtitle..msgcmd,"","Nope");
 	end
 
