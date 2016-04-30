@@ -17,7 +17,7 @@ attributes.HealRemoveDamage = 401016;
 --	leave party
 -- ======================================================
 
-local function toggleHealRemoveDamageOff() 
+function toggleHealRemoveDamageOff() 
 	cwAPI.attributes.toggleOff(attributes.HealRemoveDamage);
 end
 
@@ -33,7 +33,7 @@ end
 --	join party
 -- ======================================================
 
-local function toggleHealRemoveDamageOn() 
+function toggleHealRemoveDamageOn() 
 	cwAPI.attributes.toggleOn(attributes.HealRemoveDamage);
 end
 
