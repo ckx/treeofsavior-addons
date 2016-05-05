@@ -6,6 +6,10 @@ cwAPI = {};
 cwAPI.devMode = false;
 
 -- ======================================================
+--	imports
+-- ======================================================
+
+-- ======================================================
 --	util	
 -- ======================================================
 
@@ -27,6 +31,22 @@ function cwAPI.util.splitString(s,type)
 	if (type == '.') then m = "%." end;
 	for word in s:gmatch(m) do table.insert(words, word) end
 	return words;
+end
+
+cwAPI.util.inspect = (loadfile "../addons/cwapi/inspect.lua")();
+
+function cwAPI.util.dump(object,destination) 
+	local astext = cwAPI.util.inspect(object);
+	local file, error = io.open(destination, "w");
+	if (error) then
+		ui.SysMsg("Error opening "..name.." to write dump: "..error);
+		return false;
+	else 
+		file:write(astext);
+	    io.close(file);
+	    return true;
+	end
+
 end
 
 function cwAPI.util.tablelength(T)
