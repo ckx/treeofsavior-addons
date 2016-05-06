@@ -4,7 +4,7 @@ Here you can find all the addons I've created. Feel free to use my cwAPI to crea
 
 Also, please check my database website. It's growing! http://tos.codware.com/
 
-Have any question or suggestion about the addons or the website? Join me at [cw & toshead](https://discordapp.com/channels/178119156325941248/178119156325941248) discord channel.
+Have any question or suggestion about the addons or the website? Hit me at http://discordapp.com (user #3304).
 
 ## Download ##
 
