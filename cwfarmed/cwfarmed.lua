@@ -21,6 +21,15 @@ settings.resetXP = function()
 	settings.xpbase.qtmobs = 0;
 end
 
+-- function to reset job xp values (usually after a job level up)
+settings.resetXPJob = function()
+	settings.xpjob = {};
+	settings.xpjob.now = 0;-- no idea how to fetch it, first mob will correct it
+	settings.xpjob.gain = 0;
+	settings.xpjob.qtmobs = 0;
+end
+
+-- function to reset silver farmed (either manually or during initialization)
 settings.resetSilver = function() 
 	settings.silver = {};
 	settings.silver.farmed = 0;
@@ -82,11 +91,40 @@ local function charbaseUpdate(frame, msg)
 				local dspr = string.format("%.3f%%", prgain, 100.0);
 				local pts = settings.xpbase.gain..' pts';
 				if (settings.xpbase.qtmobs > 1) then pts = pts .. '/'..settings.xpbase.qtmobs..' mobs'; end
-				cwAPI.util.log('[XPbase] +'..dspr..' ('..pts..').');
+				cwAPI.util.log('[BaseXP] +'..dspr..' ('..pts..').');
 				settings.xpbase.gain = 0;
 				settings.xpbase.qtmobs = 0;
 			end
 			settings.xpbase.now = newxp;
+		end
+	end
+end
+
+
+-- ======================================================
+--	on char job update
+-- ======================================================
+
+local function charjobUpdate(frame, msg, str, newxp, tableinfo) 
+	if (msg == 'LEVEL_UPDATE') then
+		settings.resetXPJob();
+	end
+
+	if (options.show.xpjob) then 
+		local diff = newxp - settings.xpjob.now;
+		if (diff > 0) then 
+			settings.xpjob.qtmobs = settings.xpjob.qtmobs+1;
+			settings.xpjob.gain = settings.xpjob.gain + diff;
+			local prgain = settings.xpjob.gain/tableinfo.endExp * 100;
+			if (prgain >= options.minAlert.xpjob) then
+				local dspr = string.format("%.3f%%", prgain, 100.0);
+				local pts = settings.xpjob.gain..' pts';
+				if (settings.xpjob.qtmobs > 1) then pts = pts .. '/'..settings.xpjob.qtmobs..' mobs'; end
+				cwAPI.util.log('[JobXP] +'..dspr..' ('..pts..').');
+				settings.xpjob.gain = 0;
+				settings.xpjob.qtmobs = 0;
+			end
+			settings.xpjob.now = newxp;
 		end
 	end
 end
@@ -143,6 +181,25 @@ local function checkCommand(words)
 		return ui.MsgBox(msgtitle..msgflag);
 	end
 
+	if (cmd == 'xpjob') then
+		local dsflag = table.remove(words,1);
+		if (dsflag == 'on') then options.show.xpjob = true; end 
+		if (dsflag == 'off') then options.show.xpjob = false; end 
+		local msgflag = 'Show Job XP alert set to ['..dsflag..'].';
+		cwAPI.json.save("cwfarmed",options);
+		return ui.MsgBox(msgtitle..msgflag);
+	end
+
+	if (cmd == 'xpjobmin') then
+		local newpr = table.remove(words,1);
+		settings.resetXPJob();
+		options.minAlert.xpjob = tonumber(newpr);
+		local dspr = string.format("%.3f",options.minAlert.xpjob, 0.1);
+		local msgflag = 'Min Job XP set to ['..dspr..'%].';
+		cwAPI.json.save("cwfarmed",options);
+		return ui.MsgBox(msgtitle..msgflag);
+	end
+	
 	if (not cmd) then
 		local flagsv = ''; if (options.show.silver) then flagsv = 'on'; else flagsv = 'off'; end
 		local alertsv = options.minAlert.silver;
@@ -158,6 +215,9 @@ local function checkCommand(words)
 
 		local msgcmd = msgcmd .. '/farmed xp [on/off]{nl}'..'Show or hide xp messages (now: '..flagxp..').{nl}'..'-----------{nl}';
 		local msgcmd = msgcmd .. '/farmed xpmin [value]{nl}'..'Only show xp messages when x% is obtained (now: '..alertxp..').{nl}'..'-----------{nl}';
+		
+		local msgcmd = msgcmd .. '/farmed xpjob [on/off]{nl}'..'Show or hide job xp messages (now: '..flagxp..').{nl}'..'-----------{nl}';
+		local msgcmd = msgcmd .. '/farmed xpjobmin [value]{nl}'..'Only show job xp messages when x% is obtained (now: '..alertxp..').{nl}'..'-----------{nl}';
 		return ui.MsgBox(msgtitle..msgcmd,"","Nope");
 	end
 
@@ -178,12 +238,14 @@ _G['ADDON_LOADER']['cwfarmed'] = function()
 	end
 
 	settings.resetXP();
+	settings.resetXPJob();
 	settings.resetSilver();
 
 	-- executing onload
 	cwAPI.events.on('ITEMMSG_ITEM_COUNT',inventoryUpdate,1);
 	cwAPI.events.on('DRAW_TOTAL_VIS',refreshZeny,1);
 	cwAPI.events.on('CHARBASEINFO_ON_MSG',charbaseUpdate,1);
+	cwAPI.events.on('ON_JOB_EXP_UPDATE',charjobUpdate,1);
 
 	cwAPI.commands.register('/farmed',checkCommand);
 	cwAPI.util.log('[cwFarmed:help] /farmed');
