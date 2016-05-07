@@ -25,6 +25,7 @@ settings.resetSilver = function()
 	settings.silver = {};
 	settings.silver.farmed = 0;
 	settings.silver.gain = 0;
+	settings.silver.qtmobs = 0;
 end
 
 -- ======================================================
@@ -47,11 +48,14 @@ local function inventoryUpdate(actor,evName,itemID,itemQty)
 	-- if this is a silver update, we'll refresh the zeny
 	if (itemID == settings.silverID) then 	
 		settings.silver.farmed = settings.silver.farmed + itemQty;
-
+		settings.silver.qtmobs = settings.silver.qtmobs+1;
 		settings.silver.gain = settings.silver.gain + itemQty;		
 		if (settings.silver.gain >= options.minAlert.silver) then
-			cwAPI.util.log('[Silver] +'..GetCommaedText(settings.silver.gain)..' obtained.');
+			local pts = '[Silver] +'..GetCommaedText(settings.silver.gain)..' obtained';
+			if (settings.silver.qtmobs > 1) then pts = pts .. ' ('..settings.silver.qtmobs..' mobs)'; end
+			cwAPI.util.log(pts..'.');
 			settings.silver.gain = 0;
+			settings.silver.qtmobs = 0;
 		end
 		refreshZeny(); 
 	end
