@@ -14,11 +14,12 @@ settings.devMode = false;
 settings.silverID = 900011;
 
 -- function to reset xp values (usually after a level up)
-settings.resetXP = function()
+settings.resetXPBase = function()
 	settings.xpbase = {};
 	settings.xpbase.now = session.GetEXP();
 	settings.xpbase.gain = 0;
 	settings.xpbase.qtmobs = 0;
+	settings.xpbase.time = os.clock();
 end
 
 -- function to reset job xp values (usually after a job level up)
@@ -27,6 +28,7 @@ settings.resetXPJob = function()
 	settings.xpjob.now = 0;-- no idea how to fetch it, first mob will correct it
 	settings.xpjob.gain = 0;
 	settings.xpjob.qtmobs = 0;
+	settings.xpjob.time = os.clock();
 end
 
 -- function to reset silver farmed (either manually or during initialization)
@@ -35,6 +37,7 @@ settings.resetSilver = function()
 	settings.silver.farmed = 0;
 	settings.silver.gain = 0;
 	settings.silver.qtmobs = 0;
+	settings.silver.time = os.clock();
 end
 
 -- ======================================================
@@ -61,10 +64,12 @@ local function inventoryUpdate(actor,evName,itemID,itemQty)
 		settings.silver.gain = settings.silver.gain + itemQty;		
 		if (settings.silver.gain >= options.minAlert.silver) then
 			local pts = '[Silver] +'..GetCommaedText(settings.silver.gain)..' obtained';
+			local elapsed = os.difftime(os.clock(), settings.silver.time);
 			if (settings.silver.qtmobs > 1) then pts = pts .. ' ('..settings.silver.qtmobs..' mobs)'; end
-			cwAPI.util.log(pts..'.');
+			cwAPI.util.log(pts..' in '..os.date("!%X", elapsed)..'.');
 			settings.silver.gain = 0;
 			settings.silver.qtmobs = 0;
+			settings.silver.time = os.clock();
 		end
 		refreshZeny(); 
 	end
@@ -76,7 +81,7 @@ end
 
 local function charbaseUpdate(frame, msg) 
 	if (msg == 'LEVEL_UPDATE') then
-		settings.resetXP();
+		settings.resetXPBase();
 	end
 
 	if (options.show.xp) then 
@@ -90,10 +95,12 @@ local function charbaseUpdate(frame, msg)
 			if (prgain >= options.minAlert.xp) then
 				local dspr = string.format("%.3f%%", prgain, 100.0);
 				local pts = settings.xpbase.gain..' pts';
+				local elapsed = os.difftime(os.clock(), settings.xpbase.time);
 				if (settings.xpbase.qtmobs > 1) then pts = pts .. '/'..settings.xpbase.qtmobs..' mobs'; end
-				cwAPI.util.log('[BaseXP] +'..dspr..' ('..pts..').');
+				cwAPI.util.log('[BaseXP] +'..dspr..' ('..pts..') in '..os.date("!%X", elapsed)..'.');
 				settings.xpbase.gain = 0;
 				settings.xpbase.qtmobs = 0;
+				settings.xpbase.time = os.clock();
 			end
 			settings.xpbase.now = newxp;
 		end
@@ -119,10 +126,12 @@ local function charjobUpdate(frame, msg, str, newxp, tableinfo)
 			if (prgain >= options.minAlert.xpjob) then
 				local dspr = string.format("%.3f%%", prgain, 100.0);
 				local pts = settings.xpjob.gain..' pts';
+				local elapsed = os.difftime(os.clock(), settings.xpjob.time);
 				if (settings.xpjob.qtmobs > 1) then pts = pts .. '/'..settings.xpjob.qtmobs..' mobs'; end
-				cwAPI.util.log('[JobXP] +'..dspr..' ('..pts..').');
+				cwAPI.util.log('[JobXP] +'..dspr..' ('..pts..') in '..os.date("!%X", elapsed)..'.');
 				settings.xpjob.gain = 0;
 				settings.xpjob.qtmobs = 0;
+				settings.xpjob.time = os.clock();
 			end
 			settings.xpjob.now = newxp;
 		end
@@ -173,7 +182,7 @@ local function checkCommand(words)
 
 	if (cmd == 'xpmin') then
 		local newpr = table.remove(words,1);
-		settings.resetXP();
+		settings.resetXPBase();
 		options.minAlert.xp = tonumber(newpr);
 		local dspr = string.format("%.3f",options.minAlert.xp, 0.1);
 		local msgflag = 'Min XP set to ['..dspr..'%].';
@@ -237,7 +246,7 @@ _G['ADDON_LOADER']['cwfarmed'] = function()
 		return false;
 	end
 
-	settings.resetXP();
+	settings.resetXPBase();
 	settings.resetXPJob();
 	settings.resetSilver();
 
