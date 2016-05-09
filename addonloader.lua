@@ -26,12 +26,6 @@ end
 trydofile('../addons/utility.lua');
 
 -- ======================================================
---	JSON library (to work with setting files)
--- ======================================================
-
-JSON = (loadfile "../addons/JSON.lua")();
-
--- ======================================================
 --	load_all function
 -- ======================================================
 
@@ -46,7 +40,6 @@ _G["ADDON_LOAD_ALL"] = function()
 	-- iterating all folders
 	local i, addons, popen = 0, {}, io.popen;
 	for filename in popen('dir "'..directory..'" /b /ad'):lines() do
-
 	   	-- checking if there is {folder}/{folder}.lua inside it, and dofile-ing it if there is
 		if (debugLoading) then ui.SysMsg('- '..filename..' (lua)'); end
 	   	local fullpath = '../addons/'..filename..'/'..filename..'.lua';
@@ -88,7 +81,8 @@ _G["ADDON_LOADER"]["LOADED"] = closeAfter;
 
 local addonLoaderFrame = ui.GetFrame("addonloader");
 addonLoaderFrame:Move(0, 0);
-addonLoaderFrame:SetOffset(450, 30);
+--addonLoaderFrame:SetOffset(1600, 320);
+addonLoaderFrame:SetOffset(500,30);
 addonLoaderFrame:ShowWindow(0);
 
 -- ======================================================
