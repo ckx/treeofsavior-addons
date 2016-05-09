@@ -2,6 +2,10 @@
 
 Here you can find all the addons I've created. Feel free to use my cwAPI to create yours too! Ask me if you need help.
 
+Also, please check my database website. It's growing! http://tos.codware.com/
+
+Have any question or suggestion about the addons or the website? Hit me at http://discordapp.com (user #3304).
+
 ## Download ##
 
 <a href='https://github.com/fiote/treeofsavior-addons/releases'>Get the latest release here</a>
