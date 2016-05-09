@@ -9,6 +9,8 @@ cwAPI.devMode = false;
 --	imports
 -- ======================================================
 
+JSON = (loadfile "../addons/cwapi/JSON.lua")();
+
 -- ======================================================
 --	util	
 -- ======================================================
@@ -35,9 +37,10 @@ end
 
 cwAPI.util.inspect = (loadfile "../addons/cwapi/inspect.lua")();
 
-function cwAPI.util.dump(object,destination) 
+function cwAPI.util.dump(object,destination,flag) 
+	if (not flag) then flag = 'w'; end
 	local astext = cwAPI.util.inspect(object);
-	local file, error = io.open(destination, "w");
+	local file, error = io.open(destination,flag);
 	if (error) then
 		ui.SysMsg("Error opening "..name.." to write dump: "..error);
 		return false;
@@ -181,24 +184,41 @@ end
 
 cwAPI.commands = {};
 cwAPI.commands.hooks = {};
+cwAPI.commands.ignoreCommonChatCommands = {"/r","/w","/p","/y","/s","/g"};
 
 function cwAPI.commands.register(cmd,callback) 
 	cwAPI.commands.hooks[cmd] = callback;
 end
 
+function cwAPI.commands.closeChat()
+	local chatFrame = GET_CHATFRAME();
+	local edit = chatFrame:GetChild('mainchat');
+
+	chatFrame:ShowWindow(0);
+	edit:ShowWindow(0);
+	
+	ui.CloseFrame("chat_option");
+	ui.CloseFrame("chat_emoticon");
+end
+
 function cwAPI.commands.parseMessage(message)
-	local words = cwAPI.util.splitString(message);
-	local cmd = table.remove(words,1);
+    local words = cwAPI.util.splitString(message);
+    local cmd = table.remove(words,1);
 
-	cwAPI.util.dev(cmd,cwAPI.devMode);
+  for i,v in ipairs(cwAPI.commands.ignoreCommonChatCommands) do
+    if (tostring(cmd) == tostring(v)) then
+      break;
+    end
+  end
 
-	local fn = cwAPI.commands.hooks[cmd];
-	if (fn ~= nil) then
-		return fn(words); 
-	else		
-		fn = cwAPI.events.original('UI_CHAT');
-		fn(message);
-	end
+    local fn = cwAPI.commands.hooks[cmd];
+    if (fn ~= nil) then
+    	cwAPI.commands.closeChat();
+        return fn(words); 
+    else        
+        fn = cwAPI.events.original('UI_CHAT');
+        fn(message);
+    end
 end
 
 local parseMessage = function(message) cwAPI.commands.parseMessage(message); end
@@ -209,29 +229,68 @@ local parseMessage = function(message) cwAPI.commands.parseMessage(message); end
 
 cwAPI.json = {};
 
-function cwAPI.json.load(name)
-	local file, error = io.open("../addons/"..name.."/"..name..".json", "r");
+function cwAPI.json.load(folder,filename)
+	if (not filename) then filename = folder; end
+	local file, error = io.open("../addons/"..folder.."/"..filename..".json", "r");
 	if (error) then
-		ui.SysMsg("Error opening "..name.." to load json: "..error);
+		ui.SysMsg("Error opening "..folder.."/"..filename.." to load json: "..error);
 		return null;
 	else 
 	    local filestring = file:read("*all");
-	    local filetable = JSON:decode(filestring);    
+	    local object = JSON:decode(filestring);    
 	    io.close(file);
-	    return filetable;
+	    return object;
 	end
 end
 
-function cwAPI.json.save(name,filetable)
-	local file, error = io.open("../addons/"..name.."/"..name..".json", "w");
+function cwAPI.json.quoted(var)
+	local tp = type(var);
+	local quoted = '';
+	if (tp == 'string') then quoted = '"'..var..'"'; end
+	if (tp == 'number') then quoted = var; end
+	if (tp == 'boolean') then
+		quoted = 'false';
+		if (var) then quoted = 'true'; end
+	end
+	return quoted;
+end
+
+function cwAPI.json.encode(object,tabs) 
+	if (not tabs) then tabs = ''; end
+	local tp = type(object);
+	local json = '';
+
+	if (tp == 'table') then
+		json = json .. '{\n';
+		local count = 0;
+		local max = cwAPI.util.tablelength(object);
+
+		for atr,vlr in pairs(object) do
+			count = count + 1;
+			json = json .. tabs .. '\t' .. cwAPI.json.quoted(atr) .. ': ';
+			json = json .. cwAPI.json.encode(vlr,tabs..'\t');
+			if (count < max) then json = json .. ','; end
+			json = json .. '\n';
+		end
+
+		json = json .. tabs .. '}';
+	else
+		json = cwAPI.json.quoted(object);
+	end
+	return json;
+end
+
+function cwAPI.json.save(object,folder,filename,simple)
+	if (not filename) then filename = folder; end
+	local file, error = io.open("../addons/"..folder.."/"..filename..".json", "w");
 	if (error) then
-		ui.SysMsg("Error opening "..name.." to write json: "..error);
+		ui.SysMsg("Error opening "..folder.."/"..filename.." to write json: "..error);
 		return false;
 	else 
-		local filestring = JSON:encode_pretty(filetable);
+		local filestring = cwAPI.json.encode(object);
 		file:write(filestring);
 	    io.close(file);
-	    return true;
+		return filestring;
 	end
 end
 
