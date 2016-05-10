@@ -2,6 +2,8 @@
 --	options
 -- ======================================================
 
+local log = cwAPI.util.log;
+
 -- setting defaults
 local defaults = {};
 defaults.minAlert = {};
@@ -23,6 +25,12 @@ if (not options) then options = defaults; end
 -- applying defaults if needed
 for atr,vlr in pairs(defaults) do
 	if (not options[atr]) then options[atr] = vlr; end
+	local tpvlr = type(vlr);
+	if (tpvlr == 'table') then
+		for atr2, vlr2 in pairs(vlr) do
+			if (not options[atr][atr2]) then options[atr][atr2] = vlr2; end
+		end
+	end
 end
 
 -- ======================================================
@@ -62,10 +70,25 @@ settings.resetSilver = function()
 end
 
 settings.getPet = function() 
-	local petList = session.pet.GetPetInfoVec();
+	local pet = session.pet;
+	if (not pet) then return 0, 1, 0; end
+	log('got pet');
+
+	local petList = pet.GetPetInfoVec();
+	if (not petList) then return 0, 1, 0; end
+	log('got petlist');
+
 	local petInfo = petList:at(0);
+	if (not petInfo) then return 0, 1, 0; end
+	log('got petinfo');
+
 	local curExp = petInfo:GetExp();
+	if (not curExp) then return 0, 1, 0; end
+	log('got curExp');
+
 	local xpInfo = gePetXP.GetXPInfo(gePetXP.EXP_PET,curExp);
+	if (not xpInfo) then return 0, 1, 0; end
+	log('got xpInfo');
 
 	local max = xpInfo.totalExp - xpInfo.startExp;	
 	local now = curExp - xpInfo.startExp;	
@@ -82,7 +105,14 @@ settings.resetPet = function()
 	settings.pet.time = os.clock();
 end
 
-local log = cwAPI.util.log;
+settings.getTimeString = function(time,minv) 
+	local intime = '';
+	if (minv > 0) then 
+		local elapsed = os.difftime(os.clock(),time);
+		intime = ' in '..os.date("!%X", elapsed);
+	end
+	return intime;
+end
 
 -- ======================================================
 --	on item update
@@ -107,8 +137,8 @@ local function inventoryUpdate(actor,evName,itemID,itemQty)
 		settings.silver.gain = settings.silver.gain + itemQty;		
 		if (settings.silver.gain >= options.minAlert.silver) then
 			local pts = '[Silver] +'..GetCommaedText(settings.silver.gain)..' obtained';
-			local elapsed = os.difftime(os.clock(), settings.silver.time);
-			cwAPI.util.log(pts..' in '..os.date("!%X", elapsed)..'.');
+			local intime = settings.getTimeString(settings.silver.time,options.minAlert.silver);			
+			cwAPI.util.log(pts..intime..'.');
 			settings.silver.gain = 0;
 			settings.silver.time = os.clock();
 		end
@@ -137,10 +167,10 @@ local function charbaseUpdate(frame, msg)
 			local prgain = settings.xpbase.gain/max * 100;
 			if (prgain >= options.minAlert.xp) then
 				local dspr = string.format("%.2f%%", prgain, 100.0);
-				local pts = settings.xpbase.gain..' pts';
-				local elapsed = os.difftime(os.clock(), settings.xpbase.time);
-				if (settings.xpbase.qtmobs > 1) then pts = pts .. '/'..settings.xpbase.qtmobs..' mobs'; end
-				cwAPI.util.log('[XPbase] +'..dspr..' ('..pts..') in '..os.date("!%X", elapsed)..'.');
+				local pts = settings.xpbase.gain..' pts';				
+				if (settings.xpbase.qtmobs > 1) then pts = settings.xpbase.qtmobs..' mobs'; end
+				local intime = settings.getTimeString(settings.xpbase.time,options.minAlert.xp);
+				cwAPI.util.log('[XPbase] +'..dspr..' ('..pts..')'..intime..'.');
 				settings.xpbase.gain = 0;
 				settings.xpbase.qtmobs = 0;
 				settings.xpbase.time = os.clock();
@@ -155,22 +185,30 @@ end
 -- ======================================================
 
 local function charjobUpdate(frame, msg, str, newxp, tableinfo) 
+	if (settings.xpjob.now == 0 and newxp > 0) then
+		settings.xpjob.now = newxp;
+		return;
+	end
+
 	if (msg == 'LEVEL_UPDATE') then
 		settings.resetXPJob();
 	end
 
 	if (options.show.xpjob) then 
+
 		local diff = newxp - settings.xpjob.now;
+
 		if (diff > 0) then 
 			settings.xpjob.qtmobs = settings.xpjob.qtmobs+1;
 			settings.xpjob.gain = settings.xpjob.gain + diff;
 			local prgain = settings.xpjob.gain/tableinfo.endExp * 100;
+
 			if (prgain >= options.minAlert.xpjob) then
 				local dspr = string.format("%.2f%%", prgain, 100.0);
 				local pts = settings.xpjob.gain..' pts';
-				local elapsed = os.difftime(os.clock(), settings.xpjob.time);
-				if (settings.xpjob.qtmobs > 1) then pts = pts .. '/'..settings.xpjob.qtmobs..' mobs'; end
-				cwAPI.util.log('[XPjob] +'..dspr..' ('..pts..') in '..os.date("!%X", elapsed)..'.');
+				if (settings.xpjob.qtmobs > 1) then pts = settings.xpjob.qtmobs..' mobs'; end
+				local intime = settings.getTimeString(settings.xpjob.time,options.minAlert.xpjob);
+				cwAPI.util.log('[XPjob] +'..dspr..' ('..pts..')'..intime..'.');
 				settings.xpjob.gain = 0;
 				settings.xpjob.qtmobs = 0;
 				settings.xpjob.time = os.clock();
@@ -200,8 +238,9 @@ function petExpUpdate()
 		if (prgain >= options.minAlert.pet) then
 			local dstotal = string.format("%.1f%%",prtotal, 100.0);
 			local dspr = string.format("%.2f%%", prgain, 100.0);
-			local elapsed = os.difftime(os.clock(), settings.pet.time);
-			cwAPI.util.log('[XPpet] +'..dspr..' ('..dstotal..') in '..os.date("!%X", elapsed)..'.');
+			
+			local intime = settings.getTimeString(settings.pet.time,options.minAlert.pet);
+			cwAPI.util.log('[XPpet] +'..dspr..' ('..dstotal..')'..intime..'.');
 			settings.pet.gain = 0;
 			settings.pet.time = os.clock();
 		end
@@ -240,7 +279,7 @@ local function checkCommand(words)
 		local newvlr = table.remove(words,1);
 		local atr = string.gsub(cmd,'min','');
 
-		local word = '%'; local format = '%.3f'; local min = 0.1;
+		local word = '%'; local format = '%.2f'; local min = 0.1;
 		if (atr == 'silver') then word = 'coins'; format = '%d'; min = 1; end
 
 		options.minAlert[atr] = tonumber(newvlr);
@@ -275,7 +314,7 @@ local function checkCommand(words)
 		local msgcmd = msgcmd .. '/farmed pet [on/off]{nl}'..'Show or hide pet messages (now: '..flagpet..').{nl}'..'-----------{nl}';
 		local msgcmd = msgcmd .. '/farmed petmin [value]{nl}'..'Only show pet messages when x% is obtained (now: '..alertpet..').{nl}'..'-----------{nl}';
 
-		return ui.MsgBox(msgtitle..msgcmd,"","Nope");
+		return cwAPI.util.log(msgtitle..msgcmd);
 	end
 
 	local msgerr = 'Command not valid.{nl}'..'Type "/farmed" for help.';

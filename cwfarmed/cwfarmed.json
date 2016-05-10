@@ -1,10 +1,12 @@
 {
 	"minAlert": {
-		"pet": 0,
-		"xp": 0,
-		"silver": 0
+		"xpjob": 0.02,
+		"pet": 1,
+		"xp": 0.5,
+		"silver": 1000
 	},
 	"show": {
+		"xpjob": true,
 		"pet": true,
 		"xp": true,
 		"silver": true
