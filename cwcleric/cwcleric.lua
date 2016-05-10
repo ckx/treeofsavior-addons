@@ -57,9 +57,7 @@ local function checkIfLeftOrJoined()
 	
 	if (not settings.isOnParty and pcparty ~= nil) then
 		settings.isOnParty = true;
-		local list = session.party.GetPartyMemberList(PARTY_NORMAL);
-		local count = list:Count();
-		if (count > 0) then joinedParty(state); end
+		joinedParty(state);
 		return;
 	end
 
