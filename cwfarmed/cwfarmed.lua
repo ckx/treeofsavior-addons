@@ -70,26 +70,12 @@ settings.resetSilver = function()
 end
 
 settings.getPet = function() 
-	local pet = session.pet;
-	if (not pet) then return 0, 1, 0; end
-	log('got pet');
-
-	local petList = pet.GetPetInfoVec();
-	if (not petList) then return 0, 1, 0; end
-	log('got petlist');
+	local petList = session.pet.GetPetInfoVec();
+	if (petList:size() == 0) then return 0, 1, 0; end
 
 	local petInfo = petList:at(0);
-	if (not petInfo) then return 0, 1, 0; end
-	log('got petinfo');
-
 	local curExp = petInfo:GetExp();
-	if (not curExp) then return 0, 1, 0; end
-	log('got curExp');
-
 	local xpInfo = gePetXP.GetXPInfo(gePetXP.EXP_PET,curExp);
-	if (not xpInfo) then return 0, 1, 0; end
-	log('got xpInfo');
-
 	local max = xpInfo.totalExp - xpInfo.startExp;	
 	local now = curExp - xpInfo.startExp;	
 	local pr = now*100/max;
