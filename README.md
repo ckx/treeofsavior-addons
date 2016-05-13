@@ -10,17 +10,32 @@ Have any question or suggestion about the addons or the website? Hit me at http:
 
 <a href='https://github.com/fiote/treeofsavior-addons/releases'>Get the latest release here</a>
 
+## cwMarket
+[depends on cwAPI]
+
+cwMarket add 2 new buttons to your cabinet window. 
+
+<img src='http://i.imgur.com/au1iqNQ.png'>
+
+The first shows the number of items that already expired, and the total number of items you have selling. Clicking on it will retrieve all the expired ones.
+
+The second shows the amount of silver from your sales that is ready to retrieve, and the total amount of silver that is/will be yours in some time. Clicking on it retrieves all the silver that can be retrieved.
+
+So in the image above, I have only 1 item in the market, and it already expired so I can retrieve it.
+I also have 90k in sales to receive, but only 10k of that can be retrieved right now.
+
+## vwFarmed
+
+In the /farmed command, the xpjob info was missing #11 . That's solved now. 
+
+
 ## cwToLearn
-[![Addon Safe](https://cdn.rawgit.com/lubien/awesome-tos/master/badges/addon-safe.svg)](https://github.com/lubien/awesome-tos#addons-badges)
-[![Addon Status Unknown](https://cdn.rawgit.com/lubien/awesome-tos/master/badges/addon-unknown.svg)](https://github.com/lubien/awesome-tos#addons-badges)
+[depends on cwAPI]
 
 When selecting the "Show only attributes that can be learned" on the 'Learn Attributes' window, this addon will hide the attributes that you already have at max level.
 
 
 ## cwFarmed
-[![Addon Safe](https://cdn.rawgit.com/lubien/awesome-tos/master/badges/addon-safe.svg)](https://github.com/lubien/awesome-tos#addons-badges)
-[![Addon Status Unknown](https://cdn.rawgit.com/lubien/awesome-tos/master/badges/addon-unknown.svg)](https://github.com/lubien/awesome-tos#addons-badges)
-
 [depends on cwAPI, help avaiable at https://github.com/fiote/treeofsavior-addons/wiki/cwFarmed]
 
 Display how much silver you have grinded from mobs in the current section.
@@ -38,9 +53,6 @@ Display the ammount of XP each monster awarded you.
 <img src='http://i.imgur.com/fr20ksB.png'>
 
 ## cwCleric
-[![Addon Safe](https://cdn.rawgit.com/lubien/awesome-tos/master/badges/addon-safe.svg)](https://github.com/lubien/awesome-tos#addons-badges)
-[![Addon Status Unknown](https://cdn.rawgit.com/lubien/awesome-tos/master/badges/addon-unknown.svg)](https://github.com/lubien/awesome-tos#addons-badges)
-
 [depends on cwAPI]
 
 This addon acts as a class helper. If you have your "Heal: Remove Damage" attribute OFF and join a party, it will ask if you want to toggle it ON (so you can heal better). When you leave a party while having the attibute ON, it will ask if you want to toggle it OFF (so you can do more damage while soloing).
@@ -50,9 +62,6 @@ This addon acts as a class helper. If you have your "Heal: Remove Damage" attrib
 <img src='http://i.imgur.com/8hMvkiZ.png'>
 
 ## cwShakeness
-[![Addon Safe](https://cdn.rawgit.com/lubien/awesome-tos/master/badges/addon-safe.svg)](https://github.com/lubien/awesome-tos#addons-badges)
-[![Addon Status Unknown](https://cdn.rawgit.com/lubien/awesome-tos/master/badges/addon-unknown.svg)](https://github.com/lubien/awesome-tos#addons-badges)
-
 [depends on cwAPI]
 
 A tiny addon that disables the 'shake' the games used on certain skills. I read users having headaches and nauseas because of that, so I thought it would be nice being able to disable them while ICM doesn't get us a solution.
