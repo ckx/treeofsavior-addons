@@ -60,8 +60,7 @@ function cwMarket.cabinetItemList()
 	local frame = ui.GetFrame('market_cabinet');
 	if (not frame) then return; end
 
-	cwMarket.itemButton:SetEnable(0);
-	cwMarket.silverButton:SetEnable(0);
+	cwMarket.createRetrieveButtons();
 
 	cwMarket.readytoget = {};
 	cwMarket.readytoget.silver = {};
