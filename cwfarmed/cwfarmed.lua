@@ -282,6 +282,9 @@ local function checkCommand(words)
 		local flagxp = ''; if (options.show.xp) then flagxp = 'on'; else flagxp = 'off'; end
 		local alertxp = string.format("%.2f%%",options.minAlert.xp, 0.1);
 
+		local flagjob = ''; if (options.show.xp) then flagjob = 'on'; else flagjob = 'off'; end
+		local alertjob = string.format("%.2f%%",options.minAlert.xpjob, 0.1);
+
 		local flagpet = ''; if (options.show.pet) then flagpet = 'on'; else flagpet = 'off'; end
 		local alertpet = string.format("%.2f%%",options.minAlert.pet, 0.1);
 
@@ -294,8 +297,8 @@ local function checkCommand(words)
 		local msgcmd = msgcmd .. '/farmed xp [on/off]{nl}'..'Show or hide xp messages (now: '..flagxp..').{nl}'..'-----------{nl}';
 		local msgcmd = msgcmd .. '/farmed xpmin [value]{nl}'..'Only show xp messages when x% is obtained (now: '..alertxp..').{nl}'..'-----------{nl}';
 
-		local msgcmd = msgcmd .. '/farmed xpjob [on/off]{nl}'..'Show or hide job xp messages (now: '..flagxp..').{nl}'..'-----------{nl}';
-		local msgcmd = msgcmd .. '/farmed xpjobmin [value]{nl}'..'Only show job xp messages when x% is obtained (now: '..alertxp..').{nl}'..'-----------{nl}';
+		local msgcmd = msgcmd .. '/farmed xpjob [on/off]{nl}'..'Show or hide job xp messages (now: '..flagjob..').{nl}'..'-----------{nl}';
+		local msgcmd = msgcmd .. '/farmed xpjobmin [value]{nl}'..'Only show job xp messages when x% is obtained (now: '..alertjob..').{nl}'..'-----------{nl}';
 
 		local msgcmd = msgcmd .. '/farmed pet [on/off]{nl}'..'Show or hide pet messages (now: '..flagpet..').{nl}'..'-----------{nl}';
 		local msgcmd = msgcmd .. '/farmed petmin [value]{nl}'..'Only show pet messages when x% is obtained (now: '..alertpet..').{nl}'..'-----------{nl}';
