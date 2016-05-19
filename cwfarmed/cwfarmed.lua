@@ -171,8 +171,11 @@ end
 -- ======================================================
 
 local function charjobUpdate(frame, msg, str, newxp, tableinfo) 
-	if (settings.xpjob.now == 0 and newxp > 0) then
-		settings.xpjob.now = newxp;
+
+	local curexp = newxp - tableinfo.startExp;
+
+	if (settings.xpjob.now == 0 and curexp > 0) then
+		settings.xpjob.now = curexp;
 		return;
 	end
 
@@ -182,12 +185,12 @@ local function charjobUpdate(frame, msg, str, newxp, tableinfo)
 
 	if (options.show.xpjob) then 
 
-		local diff = newxp - settings.xpjob.now;
+		local diff = curexp - settings.xpjob.now;
 
 		if (diff > 0) then 
 			settings.xpjob.qtmobs = settings.xpjob.qtmobs+1;
 			settings.xpjob.gain = settings.xpjob.gain + diff;
-			local prgain = settings.xpjob.gain/tableinfo.endExp * 100;
+			local prgain = settings.xpjob.gain/(tableinfo.endExp-tableinfo.startExp) * 100;
 
 			if (prgain >= options.minAlert.xpjob) then
 				local dspr = string.format("%.2f%%", prgain, 100.0);
@@ -199,7 +202,7 @@ local function charjobUpdate(frame, msg, str, newxp, tableinfo)
 				settings.xpjob.qtmobs = 0;
 				settings.xpjob.time = os.clock();
 			end
-			settings.xpjob.now = newxp;
+			settings.xpjob.now = curexp;
 		end
 	end
 end
