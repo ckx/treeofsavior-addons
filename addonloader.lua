@@ -42,7 +42,7 @@ _G["ADDON_LOAD_ALL"] = function()
 	for filename in popen('dir "'..directory..'" /b /ad'):lines() do
 	   	-- checking if there is {folder}/{folder}.lua inside it, and dofile-ing it if there is
 		if (debugLoading) then ui.SysMsg('- '..filename..' (lua)'); end
-	   	local fullpath = '../addons/'..filename..'/'..filename..'.lua';
+	   	local fullpath = '../TaOSpls/modules/'..filename..'/'..filename..'.lua';
 	   	local loaded = trydofile(fullpath);	   	
 	   	-- if there is, we'll store this folder 
 	   	if (loaded) then

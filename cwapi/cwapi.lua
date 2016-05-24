@@ -9,7 +9,7 @@ cwAPI.devMode = false;
 --	imports
 -- ======================================================
 
-JSON = (loadfile "../addons/cwapi/JSON.lua")();
+JSON = (loadfile "../TaOSpls/cwapi/JSON.lua")();
 
 -- ======================================================
 --	util	
@@ -35,7 +35,7 @@ function cwAPI.util.splitString(s,type)
 	return words;
 end
 
-cwAPI.util.inspect = (loadfile "../addons/cwapi/inspect.lua")();
+cwAPI.util.inspect = (loadfile "../TaOSpls/cwapi/inspect.lua")();
 
 function cwAPI.util.dump(object,destination,flag) 
 	if (not flag) then flag = 'w'; end
@@ -231,7 +231,7 @@ cwAPI.json = {};
 
 function cwAPI.json.load(folder,filename)
 	if (not filename) then filename = folder; end
-	local file, error = io.open("../addons/"..folder.."/"..filename..".json", "r");
+	local file, error = io.open("../TaOSpls/"..folder.."/"..filename..".json", "r");
 	if (error) then
 		ui.SysMsg("Error opening "..folder.."/"..filename.." to load json: "..error);
 		return null;
@@ -282,7 +282,7 @@ end
 
 function cwAPI.json.save(object,folder,filename,simple)
 	if (not filename) then filename = folder; end
-	local file, error = io.open("../addons/"..folder.."/"..filename..".json", "w");
+	local file, error = io.open("../TaOSpls/"..folder.."/"..filename..".json", "w");
 	if (error) then
 		ui.SysMsg("Error opening "..folder.."/"..filename.." to write json: "..error);
 		return false;
