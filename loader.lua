@@ -20,12 +20,6 @@ local function trydofile(fullpath)
 end
 
 -- ======================================================
---	Fix to make this loader compatible with Excrulon addons
--- ======================================================
-
-trydofile('../addons/utility.lua');
-
--- ======================================================
 --	load_all function
 -- ======================================================
 
